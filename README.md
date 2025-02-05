@@ -25,7 +25,7 @@ Next to do: add to XBOX Game Bar
 
 6 - Go to C:/XMBemulator/ move the Shortcut for XMBemulator to your desktop
 
-7 - Run the application and enjoy!
+7 - Run the application and enjoy! (Note first runtime will take a little longer as python will install required assets)
 
 Coming soon: ROM previews when a ROM is highlighted, support for
 

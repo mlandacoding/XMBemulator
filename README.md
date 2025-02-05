@@ -8,6 +8,7 @@ Features: Fully animated background, XBOX Controller Support, PS1,PS2,PSP,GameCu
 Next to do: add to XBOX Game Bar
 
 Install Instructions:
+
 1 - Install Python
 
 2 - Place Extract .zip to C:/XMBemulator

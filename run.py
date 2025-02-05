@@ -9,18 +9,18 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 def install_and_import(package):
     try:
         __import__(package)
-        print(f"{package} is already imported.")
+        #print(f"{package} is already imported.")
     except ImportError:
-        print(f"{package} not found, installing...")
+        #print(f"{package} not found, installing...")
         try:
             subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-            print(f"{package} has been installed successfully.")
+            #print(f"{package} has been installed successfully.")
         except subprocess.CalledProcessError as e:
-            print(f"Error installing {package}: {e}")
+            #print(f"Error installing {package}: {e}")
             return
         # Retry import after installation
         globals()[package] = __import__(package)  # This puts the package into the global namespace.
-        print(f"{package} has been imported successfully.")
+        #print(f"{package} has been imported successfully.")
     
     # Explicitly import the package
     globals()[package] = __import__(package)  # Ensure the package is available by name
@@ -44,7 +44,7 @@ pygame.init()
 pygame.joystick.init()
 print(f"Joysticks connected: {pygame.joystick.get_count()}")
 # Screen Dimensions (fits the window size)
-input()
+
 script_name = os.path.basename(__file__)
 
 
@@ -238,7 +238,7 @@ def move_sparkles():
 
 # Get ROMs from Directories
 def get_roms(folder):
-    blacklist = ['.cue', '.sav','.zip','.rar','.html','.htm']  # Default blacklist if not provided
+    blacklist = ['.cue', '.sav','.zip','.rar','.html','.htm','.txt']  # Default blacklist if not provided
     if not os.path.exists(folder):
         os.makedirs(folder)  # Create folder if it doesn't exist
     # List files and filter out ones with extensions in the blacklist

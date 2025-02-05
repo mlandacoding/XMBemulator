@@ -1,7 +1,13 @@
+
 # XMBemulator
 A PS3 style menu for several emulators
 
-Instructions:
+![Desktop2025 02 04-20 52 10 06 DVR-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/65c66448-2003-41c6-9c3a-829842849294)
+
+Features: Fully animated background, XBOX Controller Support, PS1,PS2,PSP,GameCube,GameBoyAdvance,Nintendo DS emulators
+Next to do: add to XBOX Game Bar
+
+Install Instructions:
 
 1 - Place Extract .zip to C:/XMBemulator
 
@@ -19,5 +25,6 @@ Instructions:
 
 6 - Run the application and enjoy!
 
+Coming soon: ROM previews when a ROM is highlighted, support for
 
 Note: I took inspiration from RetroArchs XMB theme, I don't open their assets, I just wanted to make my own launcher :)

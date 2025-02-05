@@ -7,11 +7,11 @@ A PS3 style menu for several emulators
 Features: Fully animated background, XBOX Controller Support, PS1,PS2,PSP,GameCube,GameBoyAdvance,Nintendo DS emulators
 Next to do: add to XBOX Game Bar
 
-Install Instructions:
+# Install Instructions:
 
 1 - Install Python
 
-2 - Place Extract .zip to C:/XMBemulator
+2 - Extract .zip to C:/XMBemulator
 
 3 - Download the following emulators: Dolphin, melonDS, mGBA, PCSX2, pcsx-redux, PPSSPP, Project 64
 

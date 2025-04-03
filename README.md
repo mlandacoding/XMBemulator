@@ -29,4 +29,4 @@ Next to do: add to XBOX Game Bar
 
 Coming soon: ROM previews when a ROM is highlighted, support for
 
-Note: I took inspiration from RetroArchs XMB theme, I don't open their assets, I just wanted to make my own launcher :)
+Note: I took inspiration from RetroArchs XMB theme, I don't own their assets, I just wanted to make my own lightweight launcher :)

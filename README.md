@@ -5,7 +5,7 @@ A PS3 style menu for several emulators
 ![Desktop2025 02 04-20 52 10 06 DVR-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/65c66448-2003-41c6-9c3a-829842849294)
 
 Features: Fully animated background, XBOX Controller Support, PS1,PS2,PSP,GameCube,GameBoyAdvance,Nintendo DS emulators
-Next to do: add to XBOX Game Bar
+Allows the menu to be opened using the XBOX Guide button
 
 # Install Instructions:
 

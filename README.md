@@ -30,3 +30,4 @@ Allows the menu to be opened using the XBOX Guide button
 Coming soon: ROM previews when a ROM is highlighted, support for
 
 Note: I took inspiration from RetroArchs XMB theme, I don't own their assets, I just wanted to make my own lightweight launcher :)
+retroarch kept breaking on ps2 games so i decided to make this

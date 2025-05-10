@@ -16,25 +16,39 @@ echo Installing Python...
 
 :: Check if Python is installed and available
 echo Verifying Python installation...
-"%INSTALL_PATH%\python.exe" --version
+"%INSTALL_PATH%\Scripts\python.exe" --version
 
-:: Get current username
+:: Get current username dynamically
 set USERNAME=%USERNAME%
 
-:: Get full path to pythonw.exe
-set PYTHONW_PATH=%INSTALL_PATH%\pythonw.exe
+:: Create the shortcut in Startup folder using cmd
+echo Creating shortcut in Startup folder...
 
-:: Create .bat file to launch DetectHomeButton.py
-echo start "" "%PYTHONW_PATH%" "C:\XMBEmulator\config\DetectHomeButton\DetectHomeButton.py" > XMB_home_button.bat
+:: Define shortcut path
+set STARTUP_FOLDER=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup
+set SHORTCUT_NAME=DetectHomeButton.lnk
+set SCRIPT_PATH=C:\EmulatorOverlay\config\DetectHomeButton\DetectHomeButton.pyw
 
-:: Install pip packages
-"%INSTALL_PATH%\python.exe" -m pip install --upgrade pip
-"%INSTALL_PATH%\python.exe" -m pip install pywin32 --no-cache-dir
-"%INSTALL_PATH%\python.exe" -m pip install pyautogui
+:: Create shortcut using cmd (via Windows Script Host)
+echo Set oWS = WScript.CreateObject("WScript.Shell") > CreateShortcut.vbs
+echo Set oLink = oWS.CreateShortcut("%STARTUP_FOLDER%\%SHORTCUT_NAME%") >> CreateShortcut.vbs
+echo oLink.TargetPath="C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python313\pythonw.exe" >> CreateShortcut.vbs
+echo oLink.Arguments="%SCRIPT_PATH%" >> CreateShortcut.vbs
+echo oLink.Save >> CreateShortcut.vbs
 
-echo.
+:: Run the VBScript to create the shortcut
+cscript //nologo CreateShortcut.vbs
+
+::create .bat
+echo start "" "C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python313\pythonw.exe" "C:\XMBEmulator\config\DetectHomeButton\DetectHomeButton.py" > XMB_home_button.bat
+
+:: Do not delete the Python installer
+:: Clean up temporary files skipped
+python.exe -m pip install --upgrade pip
+pip install pywin32 --no-cache-dir
+pip install pyautogui
+
 echo Python installation and shortcut creation complete.
-echo You can move XMB_home_button.bat to 'shell:common startup' to make the emulator overlay launch on startup.
-
+echo You can move XMBEmulator_detect_home_button.bat to 'shell:common startup' to make the emulator overlay launch on startup.
 endlocal
 pause

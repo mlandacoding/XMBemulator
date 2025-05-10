@@ -2,18 +2,19 @@
 # XMBemulator
 A PS3 style menu for several emulators
 
-![Desktop2025 02 04-20 52 10 06 DVR-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/65c66448-2003-41c6-9c3a-829842849294)
+![image](https://github.com/user-attachments/assets/143ea251-cb5b-4e1e-9733-2c3d4bfdb5dd)
+
 
 Features: Fully animated background, XBOX Controller Support, PS1,PS2,PSP,GameCube,GameBoyAdvance,Nintendo DS emulators
 Allows the menu to be opened using the XBOX Guide button
 
 # Install Instructions:
 
-1 - Install Python
+1. - Extract .zip to C:/XMBemulator
 
-2 - Extract .zip to C:/XMBemulator
+2. - Run /INSTALL/install.bat
 
-3 - Download the following emulators: Dolphin, melonDS, mGBA, PCSX2, pcsx-redux, PPSSPP, Project 64
+3. - Download the following emulators: Dolphin, melonDS, mGBA, PCSX2, pcsx-redux, PPSSPP, Project 64 (and rpcs3 if your PC can handle PS3 games)
 
 4 - Extract these emulators into C:/XMBemulator/emulators as shown
 
@@ -27,7 +28,7 @@ Allows the menu to be opened using the XBOX Guide button
 
 7 - Run the application and enjoy! (Note first runtime will take a little longer as python will install required assets)
 
-Coming soon: ROM previews when a ROM is highlighted, support for
+Coming soon: ROM previews when a ROM is highlighted
 
 Note: I took inspiration from RetroArchs XMB theme, I don't own their assets, I just wanted to make my own lightweight launcher :)
 retroarch kept breaking on ps2 games so i decided to make this

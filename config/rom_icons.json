@@ -1,0 +1,18 @@
+[
+  {
+    "romName": "Spotify",
+    "image": "spotify.png"
+  },
+  {
+    "romName": "YouTube",
+    "image": "youtube.png"
+  },
+  {
+    "romName": "Netflix",
+    "image": "netflix.png"
+  },
+  {
+    "romName": "Discord",
+    "image": "discord.png"
+  }
+]

@@ -1,0 +1,2 @@
+python DetectHomeButton.py
+pause

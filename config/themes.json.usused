@@ -1,0 +1,72 @@
+themes = [
+    {
+        "name": "Dark Blue",
+        "gradient_start": (0, 0, 64),       # Dark blue
+        "gradient_end": (0, 102, 255),      # Bright blue
+        "wave_color_base": (0, 102, 255),
+        "shade_color": (200, 200, 200, 105),
+    },
+    {
+        "name": "Purple",
+        "gradient_start": (64, 0, 64),      # Purple
+        "gradient_end": (255, 0, 255),      # Magenta
+        "wave_color_base": (255, 0, 255),
+        "shade_color": (200, 200, 200, 105),
+    },
+    {
+        "name": "Classic",
+        "gradient_start": (0, 0, 128),      # Deep Blue
+        "gradient_end": (0, 0, 255),        # Blue
+        "wave_color_base": (0, 0, 255),
+        "shade_color": (200, 200, 200, 105),
+    },
+    {
+        "name": "Air Paint",
+        "gradient_start": (255, 255, 255),  # White
+        "gradient_end": (200, 200, 255),    # Light blue
+        "wave_color_base": (200, 200, 255),
+        "shade_color": (255, 255, 255, 105),
+    },
+    {
+        "name": "Blue",
+        "gradient_start": (0, 0, 255),      # Blue
+        "gradient_end": (135, 206, 235),    # Sky Blue
+        "wave_color_base": (0, 0, 255),
+        "shade_color": (200, 200, 200, 105),
+    },
+    {
+        "name": "Red",
+        "gradient_start": (255, 0, 0),      # Red
+        "gradient_end": (255, 99, 71),      # Tomato Red
+        "wave_color_base": (255, 0, 0),
+        "shade_color": (200, 200, 200, 105),
+    },
+    {
+        "name": "Green",
+        "gradient_start": (0, 128, 0),      # Green
+        "gradient_end": (144, 238, 144),    # Light Green
+        "wave_color_base": (0, 128, 0),
+        "shade_color": (200, 200, 200, 105),
+    },
+    {
+        "name": "Pink",
+        "gradient_start": (255, 182, 193),  # Light Pink
+        "gradient_end": (255, 105, 180),    # Hot Pink
+        "wave_color_base": (255, 105, 180),
+        "shade_color": (200, 200, 200, 105),
+    },
+    {
+        "name": "Gold",
+        "gradient_start": (255, 215, 0),    # Gold
+        "gradient_end": (255, 223, 0),      # Light Gold
+        "wave_color_base": (255, 215, 0),
+        "shade_color": (200, 200, 200, 105),
+    },
+    {
+        "name": "Silver",
+        "gradient_start": (192, 192, 192),  # Silver
+        "gradient_end": (211, 211, 211),    # Light Silver
+        "wave_color_base": (192, 192, 192),
+        "shade_color": (200, 200, 200, 105),
+    },
+]

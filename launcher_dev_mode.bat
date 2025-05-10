@@ -1,4 +1,4 @@
 @echo off
-TITLE CLI
+TITLE XMBemulator
 python run.py
-::pause
+pause

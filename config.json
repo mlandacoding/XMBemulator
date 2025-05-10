@@ -1,0 +1,9 @@
+{
+  "PS1": {"folder": "ROMS/PS1Roms"},
+  "PS2": {"folder": "ROMS/PS2Roms"},
+  "PSP": {"folder": "ROMS/PSPRoms"},
+  "GameCube": {"folder": "ROMS/GameCubeRoms"},
+  "N64": {"folder": "ROMS/N64Roms"},
+  "GameBoy": {"folder": "ROMS/GameBoyRoms"},
+  "Xbox": {"folder": "ROMS/XboxRoms"}
+}

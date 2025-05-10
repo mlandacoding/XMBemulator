@@ -1,0 +1,13 @@
+.lnk
+.iso
+.nds
+.gba
+.ps1
+.rvz
+.z64
+.n64
+.bin
+.eo
+.chd
+.url
+.wux

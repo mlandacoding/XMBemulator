@@ -1,0 +1,6 @@
+ROM_Folder=C:/Emulators/ROMs/
+PS1_Emulator=config/ps1.bat
+PS2_Emulator=config/ps2.bat
+PSP_Emulator=config/psp.bat
+GameBoy_Emulator=config/gameboy.bat
+N64_Emulator=config/n64.bat

@@ -1,47 +1,14 @@
-import os
+import os, sys, random, math, time, json, datetime, threading
+import ctypes
 import subprocess
-def install_and_import(package):
-    try:
-        __import__(package)
-        #print(f"{package} is already imported.")
-    except ImportError:
-        print(f"{package} not found, installing...")
-        try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-            print(f"{package} has been installed successfully.")
-        except subprocess.CalledProcessError as e:
-            print(f"Error installing {package}: {e}")
-            return
-        # Retry import after installation
-        globals()[package] = __import__(package)  # This puts the package into the global namespace.
-        print(f"{package} has been imported successfully.")
-    
-    # Explicitly import the package
-    globals()[package] = __import__(package)  # Ensure the package is available by name
-    return globals()[package]
-
+from set_all_packages import set_all_packages
+from spotify_controls import get_spotify_status, play_pause_spotfy
+import pygame.gfxdraw
 
 # Ensure required modules are available
-install_and_import("os")
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-install_and_import('pygame')
-install_and_import('random')
-install_and_import('math')
-install_and_import('sys')
-install_and_import('pygame.gfxdraw')
-install_and_import('psutil')
-install_and_import("threading")
-install_and_import("json")
-install_and_import("sys")
-install_and_import("time")
-install_and_import("ctypes")
-install_and_import("psutil")
-install_and_import("win32gui")
-install_and_import("win32process")
-install_and_import("datetime")
-install_and_import("win32com.client")
-install_and_import("win32con")
-install_and_import("win32com")
+
+
 def focus_window_by_pid(target_pid):
     def enum_handler(hwnd, _):
         if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
@@ -52,49 +19,10 @@ def focus_window_by_pid(target_pid):
                 # Bring to foreground
                 win32gui.SetForegroundWindow(hwnd)
                 return False  # Stop enumeration
+            return None
+        return None
 
     win32gui.EnumWindows(enum_handler, None)
-
-
-def play_pause_spotfy():
-    ctypes.windll.user32.keybd_event(0xB3, 0, 0, 0)      # key down
-    ctypes.windll.user32.keybd_event(0xB3, 0, 2, 0)      # key up
-def get_spotify_status():
-    # This function will return a list of active window titles along with their corresponding process names
-    def enum_handler(hwnd, result):
-        title = win32gui.GetWindowText(hwnd)  # Get window title
-        if title:  # Only consider windows with titles
-            pid = win32process.GetWindowThreadProcessId(hwnd)[1]  # Get process ID from window handle
-            try:
-                # Use psutil to get the process name from PID
-                proc = psutil.Process(pid)
-                process_name = proc.name()
-                result.append((title, process_name))
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                result.append((title, "Access Denied"))
-    
-    windows = []
-    win32gui.EnumWindows(enum_handler, windows)  # Enumerate all open windows and retrieve their process names
-
-    # for title, process_name in windows:
-    #     if(process_name == "Spotify.exe"):
-    #         print(f"Window Title: {title} | Process Name: {process_name}")
-
-    for title, process_name in windows:
-        #print(f"Window Title: {title} | Process Name: {process_name}")
-        if(process_name.lower() == "spotify.exe"):
-            if "-" in title:
-                return f"{title}"
-            elif(title == "Spotify" or title == "Spotify Premium"):
-                return "Spotify - Paused"
-            elif title in ["GDI+ Window","Default IME","MSCTFIME UI","GDI+","Spotify.exe"]:
-                continue
-            else:
-                continue
-    return "Spotify Not Running"#to do, launch spotify
-
-
-
 
 
 def move_mouse_bottom_left():
@@ -106,7 +34,6 @@ def move_mouse_bottom_left():
 
 # Hide Pygame support prompt
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
-
 
 
 def get_pid_by_exe_name(exe_name):
@@ -127,6 +54,8 @@ def get_shortcut_target(path):
     shortcut = shell.CreateShortCut(path)
     #print(shortcut.Targetpath)
     return shortcut.Targetpath
+
+
 def displayAlert(message,time):
     # Display alert
     font = pygame.font.SysFont(None, 24)
@@ -140,30 +69,10 @@ def displayAlert(message,time):
     screen.blit(alert_text, alert_text.get_rect(center=alert_rect.center))
     pygame.display.flip()
     pygame.time.wait(time * 1000)  # Show message for 2 seconds
-# Function to install a package if it's missing
 
 
 
-#move mouse of the way for a clean display
-move_mouse_bottom_left()
-# Initialize Pygame
 
-pygame.init()
-# Load the icon image
-
-icon = pygame.image.load('config/icon.png')
-
-# Set the window icon
-pygame.display.set_icon(icon)
-pygame.joystick.init()
-print("saad was here :P <3")
-print(f"Joysticks connected: {pygame.joystick.get_count()}")
-# Screen Dimensions (fits the window size)
-
-script_name = os.path.basename(__file__)
-
-running_processes = {}
-pid_running_processes = {}
 
 
 def is_another_instance_running(script_name):
@@ -180,40 +89,7 @@ def is_another_instance_running(script_name):
     return False
 
 
-if is_another_instance_running(script_name):
-    print("Another instance of this script is already running. Exiting.")
-    sys.exit(1)
 
-WIDTH, HEIGHT = pygame.display.Info().current_w, pygame.display.Info().current_h  # Dynamically fit the screen size
-#WIDTH,HEIGHT=1024,524
-screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
-pygame.display.set_caption("XMBEmulator")
-
-# Colors
-BLACK = (0, 0, 0)
-HIDDEN = (0, 0, 0, 0)
-WHITE = (255, 255, 255)
-HIGHLIGHT = (200, 200, 255)
-GRAY = (200, 200, 255)
-
-#FONTS
-font = pygame.font.Font(None, 36)
-small_font = pygame.font.Font(None, 24)
-
-
-
-settings_file = "config/settings.json"
-with open(settings_file, "r") as f:
-    settings = json.load(f)
-
-saved_theme_name = settings.get("saved_theme", "Dark Blue")  # fallback default
-hide_wii = settings.get("hide_wii", False)
-hide_xbox = settings.get("hide_xbox", False)
-hide_spotify = settings.get("hide_spotify", False)
-
-roms_icons = "config/rom_icons.json"
-with open(roms_icons, "r") as f:
-    roms_icons = json.load(f)
 
 
 
@@ -302,40 +178,7 @@ def get_theme_by_name(name):
 # Select a theme by name
 
 #current_theme = get_theme_by_name("Dark Blue")
-current_theme = get_theme_by_name(saved_theme_name)#get saved theme by settings.json
-# Wave parameters
-NUM_WAVES = 8
-FREQUENCY = 0.005
-BASE_AMPLITUDE = 25
-HORIZONTAL_SPEED = 0.005
-VERTICAL_WAVE_SPEED = 0.001
-VERTICAL_AMPLITUDE = 20
-WAVE_SPACING = 50
 
-
-# Platforms and Directories
-menu_options = [
-    {"name": "PS1", "folder": "ROMs\\PS1Roms", "image": "assets/ps1.png", "cmd": "ps1.exe"},
-    {"name": "PS2", "folder": "ROMs\\PS2Roms", "image": "assets/ps2.png", "cmd": "ps2.exe"},
-    {"name": "PS3", "folder": "ROMs\\PS3Roms", "image": "assets/ps3.png", "cmd": "ps3 .exe"},
-    {"name": "PSP", "folder": "ROMs\\PSPRoms", "image": "assets/psp.png", "cmd": "psp.exe"},
-    {"name": "GameCube", "folder": "ROMs\\GameCubeRoms", "image": "assets/gamecube.png", "cmd": "gamecube.exe"},
-    {"name": "Wii", "folder": "ROMs\\WiiRoms", "image": "assets/wii.png", "cmd": "wii.exe"},
-    {"name": "N64", "folder": "ROMs\\N64Roms", "image": "assets/n64.png", "cmd": "n64.exe"},
-    {"name": "GameBoy", "folder": "ROMs\\GameBoyRoms", "image": "assets/gameboy.png", "cmd": "gameboy.exe"},
-    {"name": "DS", "folder": "ROMs\\DSRoms", "image": "assets/ds.png", "cmd": "ds.exe"},
-    {"name": "XBOX", "folder": "ROMs\\XboxRoms", "image": "assets/xboxone.png", "cmd": "xbox.exe"},
-    #{"name": "PC", "folder": "C:\\Games", "image": "assets/desktop2.png","cmd": "pc_placeholder"},
-    {"name": "Desktop", "folder": "ROMs\\Desktop", "image": "assets/desktop2.png", "cmd": "exit"},
-]
-
-if settings.get("hide_xbox", True):
-    menu_options = [option for option in menu_options if option["name"] != "XBOX"]
-if settings.get("hide_wii", True):
-    menu_options = [option for option in menu_options if option["name"] != "Wii"]
-
-sounds = {}  # Creating an empty dictionary
-sounds["cursor"] = "assets/cursor.mp3"  # Setting a value for the "cursor" key
 
 
 
@@ -354,17 +197,10 @@ def create_gradient_surface(width, height, start_color, end_color):
 
 
 # Create the gradient background
-gradient_background = create_gradient_surface(
-    WIDTH,
-    HEIGHT,
-    current_theme["gradient_start"],
-    current_theme["gradient_end"],
-)
+
 
 def show_color_modal(screen):
-    import pygame
-    import sys
-    import json
+
 
     global current_theme
 
@@ -708,15 +544,7 @@ def launch_rom(platform_name, selected_rom=None):#Selecting an item from the men
 
 
 
-# Load Resources
-background_image = pygame.Surface((WIDTH, HEIGHT))
-background_image.fill((0, 0, 100))  # Gradient will be handled manually now
 
-controller_images = {option["name"]: pygame.image.load(option["image"]) for option in menu_options}
-disk_image = pygame.image.load("assets/disk.png")  # Disk image for ROMs
-
-# Sparkle Generation
-sparkles = []
 
 def remove_extension(filename):
     """Remove the extension from a filename using the whitelist."""
@@ -771,7 +599,7 @@ def apply_opacity(image, opacity):
     new_image.fill((255, 255, 255, opacity), special_flags=pygame.BLEND_RGBA_MULT)
     return new_image
 
-def draw_menu(selected_index, roms, selected_rom_index):
+def draw_menu(selected_index, roms, selected_rom_index, WHITE, menu_options, HIDDEN, font, controller_images, small_font, disk_image, GRAY, roms_icons):
     global horizontal_scroll_offset, vertical_scroll_offset
 
     # Horizontal scrolling logic for consoles
@@ -899,7 +727,7 @@ def draw_glowing_text(surface, text, font, color, position, pulse_speed=5, glow_
     regular_text = font.render(text, True, color)
     surface.blit(regular_text, glow_rect.topleft)
 
-def draw_wave(surface, time_offset, wave_color, wave_index):
+def draw_wave(surface, time_offset, wave_color, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY, wave_index, ):
     """Draw a single wave and return its points."""
     points = []
     start_x = 0
@@ -937,7 +765,7 @@ def draw_wave(surface, time_offset, wave_color, wave_index):
 
     return points
 
-def draw_shading(surface, wave1, wave2):
+def draw_shading(surface, wave1, wave2, current_theme):
     """Draw a shaded area between two consecutive waves."""
     if len(wave1) != len(wave2):
         return
@@ -950,6 +778,8 @@ def draw_shading(surface, wave1, wave2):
             wave2[i],
         ]
         pygame.gfxdraw.filled_polygon(surface, quad_points, current_theme["shade_color"])
+
+
 def displayTopRightHeader():
     joystickCount = len(joysticks)
     screen_width, screen_height = WIDTH, HEIGHT  # Use global WIDTH and HEIGHT
@@ -1101,12 +931,7 @@ def displaySpotifyStatus():
     screen.blit(text_surface, text_rect)
 
 
-
-
-
-
-
-def displayWave(time_offset):
+def displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY, current_theme):
     global WIDTH,HEIGHT
     # Create a transparent surface for the waves
     wave_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
@@ -1117,11 +942,11 @@ def displayWave(time_offset):
         wave_offset = i * WAVE_SPACING
         opacity = int(255 * (1 - (i / NUM_WAVES)))  # Opacity decreases for higher waves
         wave_color = (*current_theme["wave_color_base"], opacity)  # Add alpha value
-        current_wave = draw_wave(wave_surface, time_offset + wave_offset, wave_color, i)
+        current_wave = draw_wave(wave_surface, time_offset + wave_offset, wave_color, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY, i)
 
         # Add shading between consecutive waves
         if previous_wave:
-            draw_shading(wave_surface, previous_wave, current_wave)
+            draw_shading(wave_surface, previous_wave, current_wave, current_theme)
 
         previous_wave = current_wave
 
@@ -1131,7 +956,7 @@ def displayWave(time_offset):
 
 
 #check keyboard controller input
-def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event):
+def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event, sounds):
 
     # Get ROMs for selected option from the preloaded dictionary
 
@@ -1186,8 +1011,115 @@ def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,eve
                 launch_rom(menu_options[selected_index]["name"], roms[selected_rom_index])
     return True, selected_index, selected_rom_index  # Return updated values and continue
 def main():
+    set_all_packages(global_scope=globals())
+
+    # move mouse of the way for a clean display
+    move_mouse_bottom_left()
+    # Initialize Pygame
+
+    pygame.init()
+    # Load the icon image
+
+    icon = pygame.image.load('config/icon.png')
+
+    # Set the window icon
+    pygame.display.set_icon(icon)
+    pygame.joystick.init()
+    print("saad was here :P <3")
+    print(f"Joysticks connected: {pygame.joystick.get_count()}")
+    # Screen Dimensions (fits the window size)
+
+    script_name = os.path.basename(__file__)
+
+    running_processes = {}
+    pid_running_processes = {}
+
+    if is_another_instance_running(script_name):
+        print("Another instance of this script is already running. Exiting.")
+        sys.exit(1)
+
+    pygame.display.set_caption("XMBEmulator")
+
+    # Colors
+    BLACK = (0, 0, 0)
+    HIDDEN = (0, 0, 0, 0)
+    WHITE = (255, 255, 255)
+    HIGHLIGHT = (200, 200, 255)
+    GRAY = (200, 200, 255)
+
+    # FONTS
+    font = pygame.font.Font(None, 36)
+    small_font = pygame.font.Font(None, 24)
+
+    settings_file = "config/settings.json"
+    with open(settings_file, "r") as f:
+        settings = json.load(f)
+
+    saved_theme_name = settings.get("saved_theme", "Dark Blue")  # fallback default
+    hide_wii = settings.get("hide_wii", False)
+    hide_xbox = settings.get("hide_xbox", False)
+    hide_spotify = settings.get("hide_spotify", False)
+
+    roms_icons = "config/rom_icons.json"
+    with open(roms_icons, "r") as f:
+        roms_icons = json.load(f)
+
     global horizontal_scroll_offset,vertical_scroll_offset, screen,gradient_background, WIDTH, HEIGHT,joysticks
+    WIDTH, HEIGHT = pygame.display.Info().current_w, pygame.display.Info().current_h  # Dynamically fit the screen size
+    # WIDTH,HEIGHT=1024,524
+    screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
     time_offset = 0  # For animating waves
+
+    current_theme = get_theme_by_name(saved_theme_name)  # get saved theme by settings.json
+    # Wave parameters
+    NUM_WAVES = 8
+    FREQUENCY = 0.005
+    BASE_AMPLITUDE = 25
+    HORIZONTAL_SPEED = 0.005
+    VERTICAL_WAVE_SPEED = 0.001
+    VERTICAL_AMPLITUDE = 20
+    WAVE_SPACING = 50
+
+    # Platforms and Directories
+    menu_options = [
+        {"name": "PS1", "folder": "ROMs\\PS1Roms", "image": "assets/ps1.png", "cmd": "ps1.exe"},
+        {"name": "PS2", "folder": "ROMs\\PS2Roms", "image": "assets/ps2.png", "cmd": "ps2.exe"},
+        {"name": "PS3", "folder": "ROMs\\PS3Roms", "image": "assets/ps3.png", "cmd": "ps3 .exe"},
+        {"name": "PSP", "folder": "ROMs\\PSPRoms", "image": "assets/psp.png", "cmd": "psp.exe"},
+        {"name": "GameCube", "folder": "ROMs\\GameCubeRoms", "image": "assets/gamecube.png", "cmd": "gamecube.exe"},
+        {"name": "Wii", "folder": "ROMs\\WiiRoms", "image": "assets/wii.png", "cmd": "wii.exe"},
+        {"name": "N64", "folder": "ROMs\\N64Roms", "image": "assets/n64.png", "cmd": "n64.exe"},
+        {"name": "GameBoy", "folder": "ROMs\\GameBoyRoms", "image": "assets/gameboy.png", "cmd": "gameboy.exe"},
+        {"name": "DS", "folder": "ROMs\\DSRoms", "image": "assets/ds.png", "cmd": "ds.exe"},
+        {"name": "XBOX", "folder": "ROMs\\XboxRoms", "image": "assets/xboxone.png", "cmd": "xbox.exe"},
+        # {"name": "PC", "folder": "C:\\Games", "image": "assets/desktop2.png","cmd": "pc_placeholder"},
+        {"name": "Desktop", "folder": "ROMs\\Desktop", "image": "assets/desktop2.png", "cmd": "exit"},
+    ]
+
+    if settings.get("hide_xbox", True):
+        menu_options = [option for option in menu_options if option["name"] != "XBOX"]
+    if settings.get("hide_wii", True):
+        menu_options = [option for option in menu_options if option["name"] != "Wii"]
+
+    sounds = {}  # Creating an empty dictionary
+    sounds["cursor"] = "assets/cursor.mp3"  # Setting a value for the "cursor" key
+
+    gradient_background = create_gradient_surface(
+        WIDTH,
+        HEIGHT,
+        current_theme["gradient_start"],
+        current_theme["gradient_end"],
+    )
+
+    # Load Resources
+    background_image = pygame.Surface((WIDTH, HEIGHT))
+    background_image.fill((0, 0, 100))  # Gradient will be handled manually now
+
+    controller_images = {option["name"]: pygame.image.load(option["image"]) for option in menu_options}
+    disk_image = pygame.image.load("assets/disk.png")  # Disk image for ROMs
+
+    # Sparkle Generation
+    sparkles = []
 
     selected_index = 0
     selected_rom_index = 0
@@ -1241,7 +1173,7 @@ def main():
                 # Set the new gradient background
                 screen.blit(gradient_background, (0, 0))
 
-            running, selected_index, selected_rom_index = checkInput(menu_options, selected_index, selected_rom_index, roms_dict, roms,event)
+            running, selected_index, selected_rom_index = checkInput(menu_options, selected_index, selected_rom_index, roms_dict, roms,event, sounds)
 
 
         
@@ -1250,7 +1182,7 @@ def main():
         displayTopRightHeader()
         if(hide_spotify == False):
             displaySpotifyStatus()
-        displayWave(time_offset)
+        displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY,current_theme)
 
         # Update the screen
 
@@ -1261,7 +1193,7 @@ def main():
         
 
         # Draw Menu with the selected ROMs for the chosen platform
-        draw_menu(selected_index, roms, selected_rom_index)
+        draw_menu(selected_index, roms, selected_rom_index, WHITE, menu_options, HIDDEN, font, controller_images, small_font, disk_image, GRAY, roms_icons)
 
         pygame.display.flip()
         clock.tick(120)

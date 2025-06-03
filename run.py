@@ -5,9 +5,22 @@ import psutil
 from set_all_packages import set_all_packages
 from spotify_controls import get_spotify_status, play_pause_spotfy
 import pygame.gfxdraw
-
+import json
 # Ensure required modules are available
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
+
+def load_theme_json():
+    root_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of this script
+    theme_path = os.path.join(root_dir, "themes.json")
+
+    if not os.path.exists(theme_path):
+        raise FileNotFoundError(f"themes.json not found at: {theme_path}")
+
+    with open(theme_path, "r") as f:
+        themes = json.load(f)
+
+    return themes
 
 
 def focus_window_by_pid(target_pid):
@@ -86,82 +99,9 @@ def is_another_instance_running(script_name):
     return False
 
 
-themes = [
-    {
-        "name": "Dark Blue",
-        "gradient_start": (0, 0, 64),       # Dark blue
-        "gradient_end": (0, 102, 255),      # Bright blue
-        "wave_color_base": (0, 102, 255),
-        "shade_color": (200, 200, 200, 105),
-    },
-    {
-        "name": "Purple",
-        "gradient_start": (64, 0, 64),      # Purple
-        "gradient_end": (255, 0, 255),      # Magenta
-        "wave_color_base": (255, 0, 255),
-        "shade_color": (200, 200, 200, 105),
-    },
-    {
-        "name": "Classic",
-        "gradient_start": (0, 0, 128),      # Deep Blue
-        "gradient_end": (0, 0, 255),        # Blue
-        "wave_color_base": (0, 0, 255),
-        "shade_color": (200, 200, 200, 105),
-    },
-    {
-        "name": "Air Paint",
-        "gradient_start": (255, 255, 255),  # White
-        "gradient_end": (200, 200, 255),    # Light blue
-        "wave_color_base": (200, 200, 255),
-        "shade_color": (255, 255, 255, 105),
-    },
-    {
-        "name": "Blue",
-        "gradient_start": (0, 0, 255),      # Blue
-        "gradient_end": (135, 206, 235),    # Sky Blue
-        "wave_color_base": (0, 0, 255),
-        "shade_color": (200, 200, 200, 105),
-    },
-    {
-        "name": "Red",
-        "gradient_start": (255, 0, 0),      # Red
-        "gradient_end": (255, 99, 71),      # Tomato Red
-        "wave_color_base": (255, 0, 0),
-        "shade_color": (200, 200, 200, 105),
-    },
-    {
-        "name": "Green",
-        "gradient_start": (0, 128, 0),      # Green
-        "gradient_end": (144, 238, 144),    # Light Green
-        "wave_color_base": (0, 128, 0),
-        "shade_color": (200, 200, 200, 105),
-    },
-    {
-        "name": "Pink",
-        "gradient_start": (255, 182, 193),  # Light Pink
-        "gradient_end": (255, 105, 180),    # Hot Pink
-        "wave_color_base": (255, 105, 180),
-        "shade_color": (200, 200, 200, 105),
-    },
-    {
-        "name": "Gold",
-        "gradient_start": (255, 215, 0),    # Gold
-        "gradient_end": (255, 223, 0),      # Light Gold
-        "wave_color_base": (255, 215, 0),
-        "shade_color": (200, 200, 200, 105),
-    },
-    {
-        "name": "Silver",
-        "gradient_start": (192, 192, 192),  # Silver
-        "gradient_end": (211, 211, 211),    # Light Silver
-        "wave_color_base": (192, 192, 192),
-        "shade_color": (200, 200, 200, 105),
-    },
-]                                
-
 
 # Helper to get theme by name
-def get_theme_by_name(name):
+def get_theme_by_name(name, themes):
     for theme in themes:
         if theme.get("name") == name:
             return theme
@@ -182,9 +122,7 @@ def create_gradient_surface(width, height, start_color, end_color):
     return gradient_surface
 
 
-def show_color_modal(screen, settings_file):
-    global current_theme
-
+def show_color_modal(screen, settings_file, current_theme, themes):
     pygame.joystick.init()
     if pygame.joystick.get_count() > 0:
         joystick = pygame.joystick.Joystick(0)
@@ -254,7 +192,7 @@ def show_color_modal(screen, settings_file):
                             dropdown_option_focus = selected_color_index
                     elif focus_index == 1:  # Apply
                         selected_name = COLOR_OPTIONS[selected_color_index]
-                        current_theme = get_theme_by_name(selected_name)
+                        current_theme = get_theme_by_name(selected_name, themes)
                         with open(settings_file, "r") as f:
                             settings = json.load(f)
                         settings["saved_theme"] = selected_name
@@ -292,7 +230,7 @@ def show_color_modal(screen, settings_file):
                             dropdown_open = False
                 elif apply_btn.collidepoint(event.pos):
                     selected_name = COLOR_OPTIONS[selected_color_index]
-                    current_theme = get_theme_by_name(selected_name)
+                    current_theme = get_theme_by_name(selected_name, themes)
                     with open(settings_file, "r") as f:
                         settings = json.load(f)
                     settings["saved_theme"] = selected_name
@@ -337,10 +275,6 @@ def show_color_modal(screen, settings_file):
         pygame.display.update()
 
 
-
-
-
-
 def kill_processes(running_processes,pid_running_processes):
 
     if not running_processes and not pid_running_processes:
@@ -373,7 +307,7 @@ def kill_processes(running_processes,pid_running_processes):
     pid_running_processes.clear()
     print(f"running_processes: {running_processes} | pid_running_processes: {pid_running_processes}")
 
-def launch_rom(platform_name, running_processes, pid_running_processes, setting_files, menu_options, selected_rom=None):#Selecting an item from the menu
+def launch_rom(platform_name, running_processes, pid_running_processes, setting_files, menu_options, current_theme, selected_rom=None):#Selecting an item from the menu
 
     #Does selected rom exist in pid_running_processes or running_processes, if so focus the window and return. otherwise continue. this is to avoid games closing and relaunching
     #currently works for everything except xbox/pc games because pid_running_processes doesnt store the .lnk in the title to check against.
@@ -425,7 +359,7 @@ def launch_rom(platform_name, running_processes, pid_running_processes, setting_
                     #detect children to kill children processes, e.g. if we open a steam game steam opens the exe
                     parent = psutil.Process(process.pid)
                     i = 0
-                    while(i<=1000):
+                    while i<=1000:
                         time.sleep(0.01)
                         i+=1
 
@@ -455,7 +389,7 @@ def launch_rom(platform_name, running_processes, pid_running_processes, setting_
             print("Exiting to desktop")
             sys.exit()
         elif selected_rom == "Settings.eo":
-            show_color_modal(screen, setting_files)
+            show_color_modal(screen, setting_files, current_theme, themes)
             print("Settings...")
         elif selected_rom == "Return to game.eo":
             try:
@@ -937,7 +871,7 @@ def displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTIC
 
 
 #check keyboard controller input
-def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event, sounds, running_processes, pid_running_processes, settings_file):
+def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event, sounds, running_processes, pid_running_processes, settings_file, current_theme):
 
     # Get ROMs for selected option from the preloaded dictionary
 
@@ -989,13 +923,13 @@ def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,eve
                 #launch_game(menu_options[selected_index]["cmd"], roms[selected_rom_index])
                 #print(roms[selected_rom_index])
                 #print(menu_options[selected_index])
-                launch_rom(menu_options[selected_index]["name"], running_processes, pid_running_processes, settings_file, menu_options, roms[selected_rom_index])
+                launch_rom(menu_options[selected_index]["name"], running_processes, pid_running_processes, settings_file, menu_options, current_theme, roms[selected_rom_index])
     return True, selected_index, selected_rom_index  # Return updated values and continue
 
 
 def main():
     set_all_packages(global_scope=globals())
-
+    themes = load_theme_json()
     # move mouse of the way for a clean display
     move_mouse_bottom_left()
     # Initialize Pygame
@@ -1053,7 +987,7 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
     time_offset = 0  # For animating waves
 
-    current_theme = get_theme_by_name(saved_theme_name)  # get saved theme by settings.json
+    current_theme = get_theme_by_name(saved_theme_name, themes)  # get saved theme by settings.json
     # Wave parameters
     NUM_WAVES = 8
     FREQUENCY = 0.005
@@ -1157,14 +1091,14 @@ def main():
                 screen.blit(gradient_background, (0, 0))
 
             running, selected_index, selected_rom_index = checkInput(menu_options, selected_index, selected_rom_index, roms_dict, roms,event, sounds,
-                           running_processes, pid_running_processes, settings_file)
+                           running_processes, pid_running_processes, settings_file, current_theme)
 
 
         
         screen.blit(gradient_background, (0, 0))
 
         displayTopRightHeader()
-        if(hide_spotify == False):
+        if not hide_spotify:
             displaySpotifyStatus()
         displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY,current_theme)
 

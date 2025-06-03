@@ -1,6 +1,7 @@
 import os, sys, random, math, time, json, datetime, threading
 import ctypes
 import subprocess
+import psutil
 from set_all_packages import set_all_packages
 from spotify_controls import get_spotify_status, play_pause_spotfy
 import pygame.gfxdraw
@@ -71,10 +72,6 @@ def displayAlert(message,time):
     pygame.time.wait(time * 1000)  # Show message for 2 seconds
 
 
-
-
-
-
 def is_another_instance_running(script_name):
     current_pid = os.getpid()
     for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
@@ -87,11 +84,6 @@ def is_another_instance_running(script_name):
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
     return False
-
-
-
-
-
 
 
 themes = [
@@ -175,12 +167,6 @@ def get_theme_by_name(name):
             return theme
     return themes[0]  # fallback to default if not found
 
-# Select a theme by name
-
-#current_theme = get_theme_by_name("Dark Blue")
-
-
-
 
 def create_gradient_surface(width, height, start_color, end_color):
     """Create a diagonal gradient surface."""
@@ -196,12 +182,7 @@ def create_gradient_surface(width, height, start_color, end_color):
     return gradient_surface
 
 
-# Create the gradient background
-
-
-def show_color_modal(screen):
-
-
+def show_color_modal(screen, settings_file):
     global current_theme
 
     pygame.joystick.init()
@@ -392,7 +373,7 @@ def kill_processes(running_processes,pid_running_processes):
     pid_running_processes.clear()
     print(f"running_processes: {running_processes} | pid_running_processes: {pid_running_processes}")
 
-def launch_rom(platform_name, selected_rom=None):#Selecting an item from the menu
+def launch_rom(platform_name, running_processes, pid_running_processes, setting_files, menu_options, selected_rom=None):#Selecting an item from the menu
 
     #Does selected rom exist in pid_running_processes or running_processes, if so focus the window and return. otherwise continue. this is to avoid games closing and relaunching
     #currently works for everything except xbox/pc games because pid_running_processes doesnt store the .lnk in the title to check against.
@@ -474,7 +455,7 @@ def launch_rom(platform_name, selected_rom=None):#Selecting an item from the men
             print("Exiting to desktop")
             sys.exit()
         elif selected_rom == "Settings.eo":
-            show_color_modal(screen)
+            show_color_modal(screen, setting_files)
             print("Settings...")
         elif selected_rom == "Return to game.eo":
             try:
@@ -512,7 +493,7 @@ def launch_rom(platform_name, selected_rom=None):#Selecting an item from the men
         run_command(cmd)
     if platform_name == "GameBoy" and selected_rom:
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
-        cmd = f'emulators\\mGBA\\mgba.exe --fullscreen "{rom_directory}\\{selected_rom}'
+        cmd = f'emulators\\mGBA\\mGBA.exe --fullscreen "{rom_directory}\\{selected_rom}'
         run_command(cmd)
     if (platform_name == "GameCube" or platform_name == "Wii") and selected_rom:
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
@@ -956,7 +937,7 @@ def displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTIC
 
 
 #check keyboard controller input
-def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event, sounds):
+def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event, sounds, running_processes, pid_running_processes, settings_file):
 
     # Get ROMs for selected option from the preloaded dictionary
 
@@ -1008,8 +989,10 @@ def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,eve
                 #launch_game(menu_options[selected_index]["cmd"], roms[selected_rom_index])
                 #print(roms[selected_rom_index])
                 #print(menu_options[selected_index])
-                launch_rom(menu_options[selected_index]["name"], roms[selected_rom_index])
+                launch_rom(menu_options[selected_index]["name"], running_processes, pid_running_processes, settings_file, menu_options, roms[selected_rom_index])
     return True, selected_index, selected_rom_index  # Return updated values and continue
+
+
 def main():
     set_all_packages(global_scope=globals())
 
@@ -1173,7 +1156,8 @@ def main():
                 # Set the new gradient background
                 screen.blit(gradient_background, (0, 0))
 
-            running, selected_index, selected_rom_index = checkInput(menu_options, selected_index, selected_rom_index, roms_dict, roms,event, sounds)
+            running, selected_index, selected_rom_index = checkInput(menu_options, selected_index, selected_rom_index, roms_dict, roms,event, sounds,
+                           running_processes, pid_running_processes, settings_file)
 
 
         

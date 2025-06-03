@@ -1,0 +1,6 @@
+\emulators
+.pyc
+*.gba
+*.sav
+*.pyc
+\ROMS

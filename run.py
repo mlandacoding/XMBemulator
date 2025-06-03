@@ -99,7 +99,6 @@ def is_another_instance_running(script_name):
     return False
 
 
-
 # Helper to get theme by name
 def get_theme_by_name(name, themes):
     for theme in themes:
@@ -276,7 +275,6 @@ def show_color_modal(screen, settings_file, current_theme, themes):
 
 
 def kill_processes(running_processes,pid_running_processes):
-
     if not running_processes and not pid_running_processes:
         print("No processes to kill.")
         return
@@ -307,8 +305,8 @@ def kill_processes(running_processes,pid_running_processes):
     pid_running_processes.clear()
     print(f"running_processes: {running_processes} | pid_running_processes: {pid_running_processes}")
 
-def launch_rom(platform_name, running_processes, pid_running_processes, setting_files, menu_options, current_theme, selected_rom=None):#Selecting an item from the menu
 
+def launch_rom(platform_name, running_processes, pid_running_processes, setting_files, menu_options, current_theme, themes, selected_rom=None):#Selecting an item from the menu
     #Does selected rom exist in pid_running_processes or running_processes, if so focus the window and return. otherwise continue. this is to avoid games closing and relaunching
     #currently works for everything except xbox/pc games because pid_running_processes doesnt store the .lnk in the title to check against.
     print(running_processes)
@@ -441,7 +439,6 @@ def launch_rom(platform_name, running_processes, pid_running_processes, setting_
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
         cmd = f'"emulators\\PPSSPP\\PPSSPPWindows64.exe" --fullscreen "{rom_directory}\\{selected_rom}'
         run_command(cmd)
-
     if platform_name == "PS1" and selected_rom:
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
         cmd = f'"emulators\\pcsx-redux\\pcsx-redux.exe" -fullscreen -f -run -iso "\\ROMs\\PS1Roms\\{selected_rom}"'
@@ -449,16 +446,11 @@ def launch_rom(platform_name, running_processes, pid_running_processes, setting_
     if platform_name == "DS" and selected_rom:
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
         cmd = f'"emulators\\melonDS\\melonDS.exe" -f {os.getcwd()}"\\ROMS\\DSRoms\\{selected_rom}"'
-
         run_command(cmd)  
     if platform_name == "XBOX" and selected_rom:
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
         cmd = f'ROMS\\XBOXRoms\\{selected_rom}' #no exe needed, as we're pointing directly to a shortcut
-
         run_command(cmd)    
-
-
-
 
 
 def remove_extension(filename):
@@ -846,7 +838,9 @@ def displaySpotifyStatus():
     screen.blit(text_surface, text_rect)
 
 
-def displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY, current_theme):
+def displayWave(time_offset, current_theme, NUM_WAVES = 8, WAVE_SPACING = 50, VERTICAL_AMPLITUDE = 20,
+                VERTICAL_WAVE_SPEED = 0.001, BASE_AMPLITUDE = 25, FREQUENCY = 0.005):
+
     global WIDTH,HEIGHT
     # Create a transparent surface for the waves
     wave_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
@@ -871,7 +865,7 @@ def displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTIC
 
 
 #check keyboard controller input
-def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event, sounds, running_processes, pid_running_processes, settings_file, current_theme):
+def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event, sounds, running_processes, pid_running_processes, settings_file, current_theme, themes):
 
     # Get ROMs for selected option from the preloaded dictionary
 
@@ -923,23 +917,18 @@ def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,eve
                 #launch_game(menu_options[selected_index]["cmd"], roms[selected_rom_index])
                 #print(roms[selected_rom_index])
                 #print(menu_options[selected_index])
-                launch_rom(menu_options[selected_index]["name"], running_processes, pid_running_processes, settings_file, menu_options, current_theme, roms[selected_rom_index])
+                launch_rom(menu_options[selected_index]["name"], running_processes, pid_running_processes, settings_file, menu_options, current_theme, themes, roms[selected_rom_index])
     return True, selected_index, selected_rom_index  # Return updated values and continue
 
 
 def main():
     set_all_packages(global_scope=globals())
+
+    # UI initial setup
     themes = load_theme_json()
-    # move mouse of the way for a clean display
     move_mouse_bottom_left()
-    # Initialize Pygame
-
     pygame.init()
-    # Load the icon image
-
     icon = pygame.image.load('config/icon.png')
-
-    # Set the window icon
     pygame.display.set_icon(icon)
     pygame.joystick.init()
     print("saad was here :P <3")
@@ -988,14 +977,7 @@ def main():
     time_offset = 0  # For animating waves
 
     current_theme = get_theme_by_name(saved_theme_name, themes)  # get saved theme by settings.json
-    # Wave parameters
-    NUM_WAVES = 8
-    FREQUENCY = 0.005
-    BASE_AMPLITUDE = 25
-    HORIZONTAL_SPEED = 0.005
-    VERTICAL_WAVE_SPEED = 0.001
-    VERTICAL_AMPLITUDE = 20
-    WAVE_SPACING = 50
+
 
     # Platforms and Directories
     menu_options = [
@@ -1071,6 +1053,7 @@ def main():
             if j_id not in connected_ids:  # If joystick is no longer connected
                 print(f"❌ Joystick {j_id} disconnected: {joysticks[j_id].get_name()}")  # ✅ DISCONNECTED
                 del joysticks[j_id]  # Remove from tracking
+
         #BACKGROUND GRADIENT
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1091,7 +1074,7 @@ def main():
                 screen.blit(gradient_background, (0, 0))
 
             running, selected_index, selected_rom_index = checkInput(menu_options, selected_index, selected_rom_index, roms_dict, roms,event, sounds,
-                           running_processes, pid_running_processes, settings_file, current_theme)
+                           running_processes, pid_running_processes, settings_file, current_theme, themes)
 
 
         
@@ -1100,15 +1083,16 @@ def main():
         displayTopRightHeader()
         if not hide_spotify:
             displaySpotifyStatus()
-        displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY,current_theme)
 
-        # Update the screen
+        # Wave parameters
+        HORIZONTAL_SPEED = 0.005
 
-        # Increment time offset
+        displayWave(time_offset, current_theme)
         time_offset += HORIZONTAL_SPEED
-        roms = roms_dict[menu_options[selected_index]["name"]]
+        # Update the screen
+        # Increment time offset
 
-        
+        roms = roms_dict[menu_options[selected_index]["name"]]
 
         # Draw Menu with the selected ROMs for the chosen platform
         draw_menu(selected_index, roms, selected_rom_index, WHITE, menu_options, HIDDEN, font, controller_images, small_font, disk_image, GRAY, roms_icons)

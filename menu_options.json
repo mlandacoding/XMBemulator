@@ -1,0 +1,13 @@
+[
+  {"name": "PS1", "folder": "ROMs\\PS1Roms", "image": "assets/ps1.png", "cmd": "ps1.exe"},
+  {"name": "PS2", "folder": "ROMs\\PS2Roms", "image": "assets/ps2.png", "cmd": "ps2.exe"},
+  {"name": "PS3", "folder": "ROMs\\PS3Roms", "image": "assets/ps3.png", "cmd": "ps3 .exe"},
+  {"name": "PSP", "folder": "ROMs\\PSPRoms", "image": "assets/psp.png", "cmd": "psp.exe"},
+  {"name": "GameCube", "folder": "ROMs\\GameCubeRoms", "image": "assets/gamecube.png", "cmd": "gamecube.exe"},
+  {"name": "Wii", "folder": "ROMs\\WiiRoms", "image": "assets/wii.png", "cmd": "wii.exe"},
+  {"name": "N64", "folder": "ROMs\\N64Roms", "image": "assets/n64.png", "cmd": "n64.exe"},
+  {"name": "GameBoy", "folder": "ROMs\\GameBoyRoms", "image": "assets/gameboy.png", "cmd": "gameboy.exe"},
+  {"name": "DS", "folder": "ROMs\\DSRoms", "image": "assets/ds.png", "cmd": "ds.exe"},
+  {"name": "XBOX", "folder": "ROMs\\XboxRoms", "image": "assets/xboxone.png", "cmd": "xbox.exe"},
+  {"name": "Desktop", "folder": "ROMs\\Desktop", "image": "assets/desktop2.png", "cmd": "exit"}
+]

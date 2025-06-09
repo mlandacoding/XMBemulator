@@ -23,6 +23,19 @@ def load_theme_json():
     return themes
 
 
+def load_menu_json():
+    root_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of this script
+    theme_path = os.path.join(root_dir, "menu_options.json")
+
+    if not os.path.exists(theme_path):
+        raise FileNotFoundError(f"menu_options.json not found at: {theme_path}")
+
+    with open(theme_path, "r") as f:
+        themes = json.load(f)
+
+    return themes
+
+
 def focus_window_by_pid(target_pid):
     def enum_handler(hwnd, _):
         if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
@@ -997,21 +1010,7 @@ def main():
     VERTICAL_AMPLITUDE = 20
     WAVE_SPACING = 50
 
-    # Platforms and Directories
-    menu_options = [
-        {"name": "PS1", "folder": "ROMs\\PS1Roms", "image": "assets/ps1.png", "cmd": "ps1.exe"},
-        {"name": "PS2", "folder": "ROMs\\PS2Roms", "image": "assets/ps2.png", "cmd": "ps2.exe"},
-        {"name": "PS3", "folder": "ROMs\\PS3Roms", "image": "assets/ps3.png", "cmd": "ps3 .exe"},
-        {"name": "PSP", "folder": "ROMs\\PSPRoms", "image": "assets/psp.png", "cmd": "psp.exe"},
-        {"name": "GameCube", "folder": "ROMs\\GameCubeRoms", "image": "assets/gamecube.png", "cmd": "gamecube.exe"},
-        {"name": "Wii", "folder": "ROMs\\WiiRoms", "image": "assets/wii.png", "cmd": "wii.exe"},
-        {"name": "N64", "folder": "ROMs\\N64Roms", "image": "assets/n64.png", "cmd": "n64.exe"},
-        {"name": "GameBoy", "folder": "ROMs\\GameBoyRoms", "image": "assets/gameboy.png", "cmd": "gameboy.exe"},
-        {"name": "DS", "folder": "ROMs\\DSRoms", "image": "assets/ds.png", "cmd": "ds.exe"},
-        {"name": "XBOX", "folder": "ROMs\\XboxRoms", "image": "assets/xboxone.png", "cmd": "xbox.exe"},
-        # {"name": "PC", "folder": "C:\\Games", "image": "assets/desktop2.png","cmd": "pc_placeholder"},
-        {"name": "Desktop", "folder": "ROMs\\Desktop", "image": "assets/desktop2.png", "cmd": "exit"},
-    ]
+    menu_options = load_menu_json()
 
     if settings.get("hide_xbox", True):
         menu_options = [option for option in menu_options if option["name"] != "XBOX"]

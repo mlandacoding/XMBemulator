@@ -23,6 +23,19 @@ def load_theme_json():
     return themes
 
 
+def load_menu_json():
+    root_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of this script
+    theme_path = os.path.join(root_dir, "menu_options.json")
+
+    if not os.path.exists(theme_path):
+        raise FileNotFoundError(f"menu_options.json not found at: {theme_path}")
+
+    with open(theme_path, "r") as f:
+        themes = json.load(f)
+
+    return themes
+
+
 def focus_window_by_pid(target_pid):
     def enum_handler(hwnd, _):
         if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
@@ -275,6 +288,7 @@ def show_color_modal(screen, settings_file, current_theme, themes):
 
 
 def kill_processes(running_processes,pid_running_processes):
+
     if not running_processes and not pid_running_processes:
         print("No processes to kill.")
         return
@@ -305,8 +319,7 @@ def kill_processes(running_processes,pid_running_processes):
     pid_running_processes.clear()
     print(f"running_processes: {running_processes} | pid_running_processes: {pid_running_processes}")
 
-
-def launch_rom(platform_name, running_processes, pid_running_processes, setting_files, menu_options, current_theme, themes, selected_rom=None):#Selecting an item from the menu
+def launch_rom(platform_name, running_processes, pid_running_processes, setting_files, menu_options, current_theme, selected_rom=None):#Selecting an item from the menu
     #Does selected rom exist in pid_running_processes or running_processes, if so focus the window and return. otherwise continue. this is to avoid games closing and relaunching
     #currently works for everything except xbox/pc games because pid_running_processes doesnt store the .lnk in the title to check against.
     print(running_processes)
@@ -337,7 +350,7 @@ def launch_rom(platform_name, running_processes, pid_running_processes, setting_
             print(f'Launching with PID: {process.pid} {cmd_command}')
             kill_processes(running_processes,pid_running_processes)#close any other emulators running before opening new ROM
             
-            if(platform_name == "XBOX"):
+            if platform_name == "XBOX":
                 displayAlert("Loading...",3)
                 exe = get_shortcut_target(cmd)
                 #print(exe)
@@ -382,7 +395,7 @@ def launch_rom(platform_name, running_processes, pid_running_processes, setting_
 
     print(f"Running: {platform_name} - {selected_rom}")
 
-    if(platform_name == "Desktop"):
+    if platform_name == "Desktop":
         if selected_rom == "Exit.eo":
             print("Exiting to desktop")
             sys.exit()
@@ -439,6 +452,7 @@ def launch_rom(platform_name, running_processes, pid_running_processes, setting_
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
         cmd = f'"emulators\\PPSSPP\\PPSSPPWindows64.exe" --fullscreen "{rom_directory}\\{selected_rom}'
         run_command(cmd)
+
     if platform_name == "PS1" and selected_rom:
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
         cmd = f'"emulators\\pcsx-redux\\pcsx-redux.exe" -fullscreen -f -run -iso "\\ROMs\\PS1Roms\\{selected_rom}"'
@@ -446,11 +460,16 @@ def launch_rom(platform_name, running_processes, pid_running_processes, setting_
     if platform_name == "DS" and selected_rom:
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
         cmd = f'"emulators\\melonDS\\melonDS.exe" -f {os.getcwd()}"\\ROMS\\DSRoms\\{selected_rom}"'
+
         run_command(cmd)  
     if platform_name == "XBOX" and selected_rom:
         rom_directory = next(item["folder"] for item in menu_options if item["name"] == platform_name)
         cmd = f'ROMS\\XBOXRoms\\{selected_rom}' #no exe needed, as we're pointing directly to a shortcut
+
         run_command(cmd)    
+
+
+
 
 
 def remove_extension(filename):
@@ -466,6 +485,7 @@ def generate_sparkles(num=50):
     global sparkles
     sparkles = [{"size": random.uniform(0.01, 2),"x": random.randint(0, WIDTH), "y": random.randint(0, HEIGHT), "speed": random.randint(1, 4)} for _ in range(num)]
 
+
 def move_sparkles():
     global sparkles
     for sparkle in sparkles:
@@ -474,12 +494,15 @@ def move_sparkles():
             sparkle["y"] = HEIGHT
             sparkle["x"] = random.randint(0, WIDTH)
 
+
 def load_whitelist(filename):
     """Load whitelist extensions from a file."""
     if not os.path.exists(filename):
         return set()
     with open(filename, 'r') as f:
         return set(line.strip().lower() for line in f)
+
+
 def get_roms(folder):
     """Get ROMs from folder using a whitelist stored in a file. Also include folders."""
     whitelist = load_whitelist('whitelisted_rom_extensions.txt')
@@ -505,6 +528,7 @@ def apply_opacity(image, opacity):
     new_image = image.copy()
     new_image.fill((255, 255, 255, opacity), special_flags=pygame.BLEND_RGBA_MULT)
     return new_image
+
 
 def draw_menu(selected_index, roms, selected_rom_index, WHITE, menu_options, HIDDEN, font, controller_images, small_font, disk_image, GRAY, roms_icons):
     global horizontal_scroll_offset, vertical_scroll_offset
@@ -610,10 +634,6 @@ def draw_menu(selected_index, roms, selected_rom_index, WHITE, menu_options, HID
                 screen.blit(no_rom_text, no_rom_text_rect.topleft)
 
 
-
-
-
-
 def draw_glowing_text(surface, text, font, color, position, pulse_speed=5, glow_color=(255, 255, 255)):
     # Calculate the current pulse intensity using sine wave
     pulse_intensity = math.sin(pygame.time.get_ticks() / 1000.0 * pulse_speed) * 100 + 155  # Oscillates between 55 and 255
@@ -633,6 +653,7 @@ def draw_glowing_text(surface, text, font, color, position, pulse_speed=5, glow_
     # Render the actual text with regular color
     regular_text = font.render(text, True, color)
     surface.blit(regular_text, glow_rect.topleft)
+
 
 def draw_wave(surface, time_offset, wave_color, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY, wave_index, ):
     """Draw a single wave and return its points."""
@@ -671,6 +692,7 @@ def draw_wave(surface, time_offset, wave_color, VERTICAL_AMPLITUDE, VERTICAL_WAV
         )
 
     return points
+
 
 def draw_shading(surface, wave1, wave2, current_theme):
     """Draw a shaded area between two consecutive waves."""
@@ -768,6 +790,7 @@ def displayTopRightHeader():
     screen.blit(date_text, (date_text_x, date_text_y))
     screen.blit(clock_icon, (clock_x, clock_y))
 
+
 def displaySpotifyStatus():
     # Initialize persistent attributes
     if not hasattr(displaySpotifyStatus, "music_bars"):
@@ -838,9 +861,7 @@ def displaySpotifyStatus():
     screen.blit(text_surface, text_rect)
 
 
-def displayWave(time_offset, current_theme, NUM_WAVES = 8, WAVE_SPACING = 50, VERTICAL_AMPLITUDE = 20,
-                VERTICAL_WAVE_SPEED = 0.001, BASE_AMPLITUDE = 25, FREQUENCY = 0.005):
-
+def displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY, current_theme):
     global WIDTH,HEIGHT
     # Create a transparent surface for the waves
     wave_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
@@ -865,10 +886,8 @@ def displayWave(time_offset, current_theme, NUM_WAVES = 8, WAVE_SPACING = 50, VE
 
 
 #check keyboard controller input
-def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event, sounds, running_processes, pid_running_processes, settings_file, current_theme, themes):
-
+def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,event, sounds, running_processes, pid_running_processes, settings_file, current_theme):
     # Get ROMs for selected option from the preloaded dictionary
-
     # HANDLE KEYBOARD + CONTROLLER INPUT
     if event.type == pygame.JOYBUTTONDOWN:
         if(event.button == "10" or event.button == 10):
@@ -917,18 +936,23 @@ def checkInput(menu_options,selected_index,selected_rom_index,roms_dict,roms,eve
                 #launch_game(menu_options[selected_index]["cmd"], roms[selected_rom_index])
                 #print(roms[selected_rom_index])
                 #print(menu_options[selected_index])
-                launch_rom(menu_options[selected_index]["name"], running_processes, pid_running_processes, settings_file, menu_options, current_theme, themes, roms[selected_rom_index])
+                launch_rom(menu_options[selected_index]["name"], running_processes, pid_running_processes, settings_file, menu_options, current_theme, roms[selected_rom_index])
     return True, selected_index, selected_rom_index  # Return updated values and continue
 
 
 def main():
     set_all_packages(global_scope=globals())
-
-    # UI initial setup
     themes = load_theme_json()
+    # move mouse of the way for a clean display
     move_mouse_bottom_left()
+    # Initialize Pygame
+
     pygame.init()
+    # Load the icon image
+
     icon = pygame.image.load('config/icon.png')
+
+    # Set the window icon
     pygame.display.set_icon(icon)
     pygame.joystick.init()
     print("saad was here :P <3")
@@ -977,31 +1001,23 @@ def main():
     time_offset = 0  # For animating waves
 
     current_theme = get_theme_by_name(saved_theme_name, themes)  # get saved theme by settings.json
+    # Wave parameters
+    NUM_WAVES = 8
+    FREQUENCY = 0.005
+    BASE_AMPLITUDE = 25
+    HORIZONTAL_SPEED = 0.005
+    VERTICAL_WAVE_SPEED = 0.001
+    VERTICAL_AMPLITUDE = 20
+    WAVE_SPACING = 50
 
-
-    # Platforms and Directories
-    menu_options = [
-        {"name": "PS1", "folder": "ROMs\\PS1Roms", "image": "assets/ps1.png", "cmd": "ps1.exe"},
-        {"name": "PS2", "folder": "ROMs\\PS2Roms", "image": "assets/ps2.png", "cmd": "ps2.exe"},
-        {"name": "PS3", "folder": "ROMs\\PS3Roms", "image": "assets/ps3.png", "cmd": "ps3 .exe"},
-        {"name": "PSP", "folder": "ROMs\\PSPRoms", "image": "assets/psp.png", "cmd": "psp.exe"},
-        {"name": "GameCube", "folder": "ROMs\\GameCubeRoms", "image": "assets/gamecube.png", "cmd": "gamecube.exe"},
-        {"name": "Wii", "folder": "ROMs\\WiiRoms", "image": "assets/wii.png", "cmd": "wii.exe"},
-        {"name": "N64", "folder": "ROMs\\N64Roms", "image": "assets/n64.png", "cmd": "n64.exe"},
-        {"name": "GameBoy", "folder": "ROMs\\GameBoyRoms", "image": "assets/gameboy.png", "cmd": "gameboy.exe"},
-        {"name": "DS", "folder": "ROMs\\DSRoms", "image": "assets/ds.png", "cmd": "ds.exe"},
-        {"name": "XBOX", "folder": "ROMs\\XboxRoms", "image": "assets/xboxone.png", "cmd": "xbox.exe"},
-        # {"name": "PC", "folder": "C:\\Games", "image": "assets/desktop2.png","cmd": "pc_placeholder"},
-        {"name": "Desktop", "folder": "ROMs\\Desktop", "image": "assets/desktop2.png", "cmd": "exit"},
-    ]
+    menu_options = load_menu_json()
 
     if settings.get("hide_xbox", True):
         menu_options = [option for option in menu_options if option["name"] != "XBOX"]
     if settings.get("hide_wii", True):
         menu_options = [option for option in menu_options if option["name"] != "Wii"]
 
-    sounds = {}  # Creating an empty dictionary
-    sounds["cursor"] = "assets/cursor.mp3"  # Setting a value for the "cursor" key
+    sounds = {"cursor": "assets/cursor.mp3"}
 
     gradient_background = create_gradient_surface(
         WIDTH,
@@ -1038,6 +1054,7 @@ def main():
     generate_sparkles()
     roms = roms_dict[menu_options[selected_index]["name"]]
     joysticks = {}  # Dictionary to track connected joysticks
+
     while running:
         # === Detect and Initialize Newly Connected Joysticks ===
         for i in range(pygame.joystick.get_count()):  
@@ -1074,7 +1091,7 @@ def main():
                 screen.blit(gradient_background, (0, 0))
 
             running, selected_index, selected_rom_index = checkInput(menu_options, selected_index, selected_rom_index, roms_dict, roms,event, sounds,
-                           running_processes, pid_running_processes, settings_file, current_theme, themes)
+                           running_processes, pid_running_processes, settings_file, current_theme)
 
 
         
@@ -1083,15 +1100,12 @@ def main():
         displayTopRightHeader()
         if not hide_spotify:
             displaySpotifyStatus()
+        displayWave(time_offset, NUM_WAVES, WAVE_SPACING, VERTICAL_AMPLITUDE, VERTICAL_WAVE_SPEED, BASE_AMPLITUDE, FREQUENCY,current_theme)
 
-        # Wave parameters
-        HORIZONTAL_SPEED = 0.005
-
-        displayWave(time_offset, current_theme)
-        time_offset += HORIZONTAL_SPEED
         # Update the screen
-        # Increment time offset
 
+        # Increment time offset
+        time_offset += HORIZONTAL_SPEED
         roms = roms_dict[menu_options[selected_index]["name"]]
 
         # Draw Menu with the selected ROMs for the chosen platform
